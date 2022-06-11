@@ -14,7 +14,6 @@ image.src = './images/EllwoodCity.png'
 
 const playerImage = new Image()
 playerImage.src = './images/playerDown.png'
-
 class Sprite {
   constructor({ position, velocity, image }) {
     this.position = position
