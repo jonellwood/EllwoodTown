@@ -58,6 +58,7 @@ image.src = "./images/EllwoodCity.png";
 
 const playerImage = new Image();
 playerImage.src = "./images/playerDown.png";
+
 class Sprite {
   constructor({ position, velocity, image }) {
     this.position = position;
@@ -66,6 +67,17 @@ class Sprite {
 
   draw() {
     c.drawImage(this.image, this.position.x, this.position.y);
+    c.drawImage(
+      this.image,
+      0,
+      0,
+      this.image.width / 4,
+      this.image.height,
+      canvas.width / 2 - this.image.width / 4 / 2,
+      canvas.height / 2 - this.image.height / 2,
+      this.image.width / 4,
+      this.image.height
+    );
   }
 }
 
@@ -105,18 +117,6 @@ function animate() {
   boundaries.forEach((boundary) => {
     boundary.draw();
   });
-
-  c.drawImage(
-    playerImage,
-    0,
-    0,
-    playerImage.width / 4,
-    playerImage.height,
-    canvas.width / 2 - playerImage.width / 4 / 2,
-    canvas.height / 2 - playerImage.height / 2,
-    playerImage.width / 4,
-    playerImage.height
-  );
 
   if (keys.w.pressed && lastKey === "w") {
     movables.forEach((movable) => {
