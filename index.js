@@ -122,31 +122,33 @@ const keys = {
   },
 };
 
-const testBoundary = new Boundary({
-  position: {
-    x: 400,
-    y: 400,
-  },
-});
+const movables = [background, ...boundaries];
 
-const movables = [background, testBoundary];
+function rectangularCollision({ rectangle1, rectangle2 }) {
+  return (
+    rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+    rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+    rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
+    rectangle1.position.y + rectangle1.height >= rectangle2.position.y
+  );
+}
 
 function animate() {
   window.requestAnimationFrame(animate);
   background.draw();
-  // boundaries.forEach((boundary) => {
-  //   boundary.draw();
-  // });
-  testBoundary.draw();
+  boundaries.forEach((boundary) => {
+    boundary.draw();
+    if (
+      rectangularCollision({
+        rectangle1: player,
+        rectangle2: boundary,
+      })
+    ) {
+      console.log("crash");
+    }
+  });
+
   player.draw();
-  if (
-    player.position.x + player.width >= testBoundary.position.x &&
-    player.position.x <= testBoundary.position.x + testBoundary.width &&
-    player.position.y <= testBoundary.position.y + testBoundary.height &&
-    player.position.y + player.height >= testBoundary.position.y
-  ) {
-    console.log("crash");
-  }
 
   if (keys.w.pressed && lastKey === "w") {
     movables.forEach((movable) => {
