@@ -26,7 +26,7 @@ class Boundary {
   }
 
   draw() {
-    ctx.fillStyle = "rgba(255, 0, 0, 0.0)";
+    ctx.fillStyle = "red";
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
@@ -37,7 +37,7 @@ const offset = {
   x: -585,
   y: -450,
 };
-
+// console.log(offset);
 collisionsMap.forEach((row, i) => {
   row.forEach((symbol, j) => {
     if (symbol === 1025)
@@ -51,12 +51,13 @@ collisionsMap.forEach((row, i) => {
       );
   });
 });
-
+// console.log(boundaries);
 const image = new Image();
 image.src = "./images/EllwoodCity.png";
-
 const playerImage = new Image();
 playerImage.src = "./images/playerDown.png";
+// console.log(image);
+// console.log(playerImage);
 
 class Sprite {
   constructor({ position, velocity, image, frames = { max: 1 } }) {
@@ -87,6 +88,7 @@ class Sprite {
 
 const player = new Sprite({
   position: {
+    // reference a static value of the sprite image. Get the dimensions from properties of the sprite. This one is 192 x 68. Hence the static values used below.
     x: canvas.width / 2 - 192 / 4 / 2,
     y: canvas.height / 2 - 68 / 2,
   },
@@ -95,7 +97,7 @@ const player = new Sprite({
     max: 4,
   },
 });
-
+// console.log(player);
 const background = new Sprite({
   position: {
     x: offset.x,
@@ -103,7 +105,7 @@ const background = new Sprite({
   },
   image: image,
 });
-
+// console.log(background);
 const keys = {
   w: {
     pressed: false,
@@ -118,9 +120,10 @@ const keys = {
     pressed: false,
   },
 };
-
+// console.log(keys);
 const movables = [background, ...boundaries];
-
+// console.log(movables);
+// rec1 is player rec2 is a boundary
 function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
     rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -237,23 +240,28 @@ function animate() {
       });
   }
 }
+
 animate();
 
 let lastKey = "";
+
 window.addEventListener("keydown", (e) => {
   switch (e.key) {
     case "w":
       keys.w.pressed = true;
       lastKey = "w";
       break;
+
     case "a":
       keys.a.pressed = true;
       lastKey = "a";
       break;
+
     case "s":
       keys.s.pressed = true;
       lastKey = "s";
       break;
+
     case "d":
       keys.d.pressed = true;
       lastKey = "d";
@@ -277,3 +285,5 @@ window.addEventListener("keyup", (e) => {
       break;
   }
 });
+
+console.log(keys.w);
