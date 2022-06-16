@@ -97,7 +97,7 @@ const keys = {
 //   y: 400,
 // });
 
-const movables = [background, boundaries];
+const movables = [background, ...boundaries];
 
 function animate() {
   window.requestAnimationFrame(animate);
