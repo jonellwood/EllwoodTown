@@ -138,22 +138,35 @@ function animate() {
   background.draw();
   boundaries.forEach((boundary) => {
     boundary.draw();
-    if (
-      rectangularCollision({
-        rectangle1: player,
-        rectangle2: boundary,
-      })
-    ) {
-      console.log("crash");
-    }
   });
-
   player.draw();
 
+  let moving = true;
+
   if (keys.w.pressed && lastKey === "w") {
-    movables.forEach((movable) => {
-      movable.position.y += 3;
-    });
+    for (let i = 0; i < boundaries.length; i++) {
+      const boundary = boundaries[i];
+      if (
+        rectangularCollision({
+          rectangle1: player,
+          rectangle2: {
+            ...boundary,
+            position: {
+              x: boundary.position.x,
+              y: boundary.position.y + 3,
+            },
+          },
+        })
+      ) {
+        console.log("crash");
+        moving = false;
+        break;
+      }
+    }
+    if (moving)
+      movables.forEach((movable) => {
+        movable.position.y += 3;
+      });
   } else if (keys.a.pressed && lastKey === "a") {
     movables.forEach((movable) => {
       movable.position.x += 3;
