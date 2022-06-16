@@ -152,6 +152,36 @@ function animate() {
   player.draw();
   foreground.draw();
 
+  if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+    for (let i = 0; i < battleZones.length; i++) {
+      const battleZone = battleZones[i];
+      // overlappingArea calculated by cutting player area in half and then comparing if half of that half is in the battle zone or not. This is complicated shit! Thanks to Chris for doing all this math for us! The order of operations is crazy
+      const overlappingArea =
+        (Math.min(
+          player.position.x + player.width,
+          battleZone.position.x + battleZone.width
+        ) -
+          Math.max(player.position.x, battleZone.position.x)) *
+        (Math.min(
+          player.position.y + player.height,
+          battleZone.position.y + battleZone.height
+        ) -
+          Math.max(player.position.y, battleZone.position.y));
+
+      if (
+        rectangularCollision({
+          rectangle1: player,
+          rectangle2: battleZone,
+        }) &&
+        overlappingArea > (player.width * player.height) / 2 &&
+        Math.random() < 0.01
+      ) {
+        console.log("battle");
+        break;
+      }
+    }
+  }
+
   let moving = true;
   player.moving = false;
 
@@ -177,6 +207,7 @@ function animate() {
         break;
       }
     }
+
     if (moving)
       movables.forEach((movable) => {
         movable.position.y += 3;
