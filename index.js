@@ -1,10 +1,10 @@
 console.log(
   "This project is based in part on a tutorial from ChrisCourses.com with artwork from itch.io"
 );
-// console.log(collisions);
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
+// console.log(battleZones);
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -13,7 +13,13 @@ const collisionsMap = [];
 for (let i = 0; i < collisions.length; i += 70) {
   collisionsMap.push(collisions.slice(i, 70 + i));
 }
-// console.log(collisionsMap);
+
+const battleZonesMap = [];
+// 70 in for loop is based on the tile width of the map
+for (let i = 0; i < battleZonesData.length; i += 70) {
+  battleZonesMap.push(battleZonesData.slice(i, 70 + i));
+}
+// console.log(battleZonesMap);
 
 const boundaries = [];
 // create const for offset to it can be called for player position and boundary position with the same constant offset
@@ -37,6 +43,24 @@ collisionsMap.forEach((row, i) => {
 });
 
 // console.log(boundaries);
+
+const battleZones = [];
+
+battleZonesMap.forEach((row, i) => {
+  row.forEach((symbol, j) => {
+    if (symbol === 1025)
+      battleZones.push(
+        new Boundary({
+          position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y,
+          },
+        })
+      );
+  });
+});
+
+console.log(battleZones);
 
 const image = new Image();
 image.src = "./images/EllwoodCity.png";
@@ -105,7 +129,7 @@ const keys = {
   },
 };
 
-const movables = [background, ...boundaries, foreground];
+const movables = [background, ...boundaries, foreground, ...battleZones];
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
@@ -121,6 +145,9 @@ function animate() {
   background.draw();
   boundaries.forEach((boundary) => {
     boundary.draw();
+  });
+  battleZones.forEach((battleZone) => {
+    battleZone.draw();
   });
   player.draw();
   foreground.draw();
@@ -145,7 +172,7 @@ function animate() {
           },
         })
       ) {
-        console.log("crash");
+        // console.log("crash");
         moving = false;
         break;
       }
@@ -171,7 +198,7 @@ function animate() {
           },
         })
       ) {
-        console.log("crash");
+        // console.log("crash");
         moving = false;
         break;
       }
@@ -197,7 +224,7 @@ function animate() {
           },
         })
       ) {
-        console.log("crash");
+        // console.log("crash");
         moving = false;
         break;
       }
@@ -223,7 +250,7 @@ function animate() {
           },
         })
       ) {
-        console.log("crash");
+        // console.log("crash");
         moving = false;
         break;
       }
