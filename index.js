@@ -60,26 +60,37 @@ const playerImage = new Image();
 playerImage.src = "./images/playerDown.png";
 
 class Sprite {
-  constructor({ position, velocity, image }) {
+  constructor({ position, velocity, image, frames = { max: 1 } }) {
     this.position = position;
     this.image = image;
+    this.frames = frames;
   }
 
   draw() {
-    c.drawImage(this.image, this.position.x, this.position.y);
     c.drawImage(
       this.image,
       0,
       0,
-      this.image.width / 4,
+      this.image.width / this.frames.max,
       this.image.height,
-      canvas.width / 2 - this.image.width / 4 / 2,
-      canvas.height / 2 - this.image.height / 2,
-      this.image.width / 4,
+      this.position.x,
+      this.position.y,
+      this.image.width / this.frames.max,
       this.image.height
     );
   }
 }
+
+const player = new Sprite({
+  position: {
+    x: canvas.width / 2 - 192 / 4 / 2, // 192 and 68 come from the dimensions of the sprite
+    y: canvas.height / 2 - 68 / 2,
+  },
+  image: playerImage,
+  frames: {
+    max: 4,
+  },
+});
 
 const background = new Sprite({
   position: {
@@ -117,6 +128,7 @@ function animate() {
   boundaries.forEach((boundary) => {
     boundary.draw();
   });
+  player.draw();
 
   if (keys.w.pressed && lastKey === "w") {
     movables.forEach((movable) => {
