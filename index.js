@@ -4,7 +4,7 @@ console.log(
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
-// console.log(battleZones);
+// console.log(gsap);
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -60,7 +60,7 @@ battleZonesMap.forEach((row, i) => {
   });
 });
 
-console.log(battleZones);
+// console.log(battleZones);
 
 const image = new Image();
 image.src = "./images/EllwoodCity.png";
@@ -140,8 +140,12 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
   );
 }
 
+const battle = {
+  initiated: false,
+};
+
 function animate() {
-  window.requestAnimationFrame(animate);
+  const animationId = window.requestAnimationFrame(animate);
   background.draw();
   boundaries.forEach((boundary) => {
     boundary.draw();
@@ -151,7 +155,11 @@ function animate() {
   });
   player.draw();
   foreground.draw();
+  let moving = true;
+  player.moving = false;
 
+  if (battle.initiated) return;
+  // this is where we activate a battle
   if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
     for (let i = 0; i < battleZones.length; i++) {
       const battleZone = battleZones[i];
@@ -176,14 +184,34 @@ function animate() {
         overlappingArea > (player.width * player.height) / 2 &&
         Math.random() < 0.01
       ) {
-        console.log("battle");
+        console.log("battle sequence activated");
+        // deactivate the current animation loop for perf?
+        window.cancelAnimationFrame(animationId);
+        battle.initiated = true;
+        gsap.to("#overlappingDiv", {
+          opacity: 1,
+          repeat: 3,
+          yoyo: true,
+          duration: 0.4,
+          onComplete() {
+            gsap.to("#overlappingDiv", {
+              opacity: 1,
+              duration: 0.4,
+              onComplete() {
+                // now we need to activate a new animation loop for battle scene
+                animateBattle();
+                gsap.to("#overlappingDiv", {
+                  opacity: 0,
+                  duration: 0.4,
+                });
+              },
+            });
+          },
+        });
         break;
       }
     }
   }
-
-  let moving = true;
-  player.moving = false;
 
   if (keys.w.pressed && lastKey === "w") {
     player.moving = true;
@@ -292,7 +320,24 @@ function animate() {
       });
   }
 }
-animate();
+// animate();
+
+const battleBackgroundImage = new Image();
+battleBackgroundImage.src = "./images/battleBackground.png";
+const battleBackground = new Sprite({
+  position: {
+    x: 0,
+    y: 0,
+  },
+  image: battleBackgroundImage,
+});
+function animateBattle() {
+  window.requestAnimationFrame(animateBattle);
+  console.log("battle animation starting. Hold ON!! ");
+  battleBackground.draw();
+}
+
+animateBattle();
 
 let lastKey = "";
 window.addEventListener("keydown", (e) => {
