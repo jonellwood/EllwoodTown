@@ -320,7 +320,7 @@ function animate() {
       });
   }
 }
-// animate();
+animate();
 
 const battleBackgroundImage = new Image();
 battleBackgroundImage.src = "./images/battleBackground.png";
@@ -337,7 +337,7 @@ function animateBattle() {
   battleBackground.draw();
 }
 
-animateBattle();
+// animateBattle();
 
 let lastKey = "";
 window.addEventListener("keydown", (e) => {
