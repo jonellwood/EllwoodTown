@@ -347,6 +347,7 @@ const draggle = new Sprite({
     hold: 30,
   },
   animate: true,
+  isEnemy: true,
 });
 
 const embyImage = new Image();
@@ -372,8 +373,21 @@ function animateBattle() {
   emby.draw();
 }
 
-animateBattle();
 // animate();
+animateBattle();
+
+document.querySelectorAll("button").forEach((button) => {
+  button.addEventListener("click", () => {
+    emby.respect({
+      respect: {
+        name: "Compliment",
+        healing: 20,
+        type: "Normal",
+      },
+      recipient: draggle,
+    });
+  });
+});
 
 let lastKey = "";
 window.addEventListener("keydown", (e) => {
