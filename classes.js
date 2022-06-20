@@ -7,6 +7,7 @@ class Sprite {
     sprites,
     animate = false,
     isEnemy = false,
+    name,
   }) {
     this.position = position;
     this.image = image;
@@ -20,6 +21,7 @@ class Sprite {
     this.opacity = 1;
     this.health = 0;
     this.isEnemy = isEnemy;
+    this.name = name;
   }
 
   draw() {
@@ -48,46 +50,94 @@ class Sprite {
       else this.frames.val = 0;
     }
   }
-  respect({ respect, recipient }) {
-    const tl = gsap.timeline();
-
-    this.health += respect.healing;
-
-    let movementDistance = 20;
-    if (this.isEnemy) movementDistance = -20;
-
+  respect({ respect, recipient, renderedSprites }) {
     let healthBar = "#enemyHealthBar";
     if (this.isEnemy) healthBar = "#playerHealthBar";
 
-    tl.to(this.position, {
-      x: this.position.x - movementDistance,
-    })
-      .to(this.position, {
-        x: this.position.x + movementDistance * 2,
-        duration: 0.1,
-        onComplete: () => {
-          // enemy gets hit with respect
-          gsap.to(healthBar, {
-            width: this.health + "%",
-          });
-          gsap.to(recipient.position, {
-            y: recipient.position.y + 10,
-            yoyo: true,
-            repeat: 5,
-            duration: 0.08,
-          });
+    this.health += respect.healing;
 
-          gsap.to(recipient, {
-            opacity: 0,
-            yoyo: true,
-            repeat: 5,
-            duration: 0.08,
+    switch (respect.name) {
+      case "Admire":
+        const heartImage = new Image();
+        heartImage.src = "./images/heart.png";
+        const heart = new Sprite({
+          position: {
+            x: this.position.x,
+            y: this.position.y,
+          },
+          image: heartImage,
+        });
+
+        renderedSprites.push(heart);
+
+        gsap.to(heart.position, {
+          x: recipient.position.x,
+          y: recipient.position.y,
+          duration: 1.5,
+          onComplete: () => {
+            gsap.to(recipient.healthBar, {
+              width: this.health + "%",
+            });
+            gsap.to(recipient.position, {
+              y: recipient.position.y + 10,
+              yoyo: true,
+              repeat: 5,
+              duration: 0.08,
+            });
+
+            gsap.to(recipient, {
+              opacity: 0,
+              yoyo: true,
+              repeat: 5,
+              duration: 0.08,
+            });
+            renderedSprites.pop();
+          },
+        });
+
+        break;
+
+      case "Compliment":
+        const tl = gsap.timeline();
+
+        let movementDistance = 20;
+        if (this.isEnemy) movementDistance = -20;
+
+        tl.to(this.position, {
+          x: this.position.x - movementDistance,
+        })
+          .to(this.position, {
+            x: this.position.x + movementDistance * 2,
+            duration: 0.1,
+            onComplete: () => {
+              // enemy gets hit with respect
+              gsap.to(healthBar, {
+                width: this.health + "%",
+              });
+              gsap.to(recipient.position, {
+                y: recipient.position.y + 10,
+                yoyo: true,
+                repeat: 5,
+                duration: 0.08,
+              });
+
+              gsap.to(recipient, {
+                opacity: 0,
+                yoyo: true,
+                repeat: 5,
+                duration: 0.08,
+              });
+            },
+          })
+          .to(this.position, {
+            x: this.position.x,
           });
-        },
-      })
-      .to(this.position, {
-        x: this.position.x,
-      });
+        break;
+    }
+
+    document.querySelector("#wordBox").style.display = "block";
+    document.querySelector("#wordBox").innerHTML =
+      this.name + " used " + respect.name;
   }
 }
 

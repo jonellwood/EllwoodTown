@@ -53,7 +53,7 @@
                 <!-- Draggles health bar  -->
                 <div style="height: 5px; background-color: #ccc; margin-top: 10px;"></div>
                 <div id="enemyHealthBar"
-                    style="height: 5px; background-color: green; position: absolute; top: 0; left: 0; ">
+                    style="height: 5px; background-color: green; position: absolute; top: 0; left: 0; right: 90% ">
                 </div>
             </div>
         </div>
@@ -63,16 +63,20 @@
             <div style="position: relative;">
                 <div style="height: 5px; background-color: #ccc; margin-top: 10px;"></div>
                 <div id="playerHealthBar"
-                    style="height: 5px; background-color: green; position: absolute; top: 0; left: 0;">
+                    style="height: 5px; background-color: green; position: absolute; top: 0; left: 0; right: 90%">
                 </div>
             </div>
         </div>
         <canvas></canvas>
         <div
             style="background-color: white; height: 130px; position: absolute; bottom: 0; right: 0; left: 0; border-top: 4px black solid; display: flex;">
+            <div id="wordBox"
+                style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: white; padding: 12px; display: none; cursor: pointer;">
+                Dummy Test
+            </div>
             <div style="width: 66.6%; display: grid; grid-template-columns: 1fr 1fr;">
                 <button>Compliment</button>
-                <button>Respect 2</button>
+                <button>Admire</button>
                 <!-- <button>Respect 3</button>
                 <button>Respect 4</button> -->
             </div>
@@ -88,7 +92,9 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="./data/battleZones.js"></script>
 <script src="./data/collisions.js"></script>
+<script src="./data/respects.js"></script>
 <script src="classes.js"></script>
 <script src="index.js"></script>
+<script src="battleScene.js"></script>
 
 </html>
