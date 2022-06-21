@@ -185,11 +185,11 @@ function animate() {
         overlappingArea > (player.width * player.height) / 2 &&
         Math.random() < 0.01
       ) {
-        console.log("battle sequence activated");
+        // console.log("battle sequence activated");
         // deactivate the current animation loop for perf?
         window.cancelAnimationFrame(animationId);
 
-        audio.Map.stop();
+        audio.map.stop();
         audio.initBattle.play();
         audio.battle.play();
 
@@ -373,7 +373,7 @@ window.addEventListener("keyup", (e) => {
 let clicked = false;
 addEventListener("click", () => {
   if (!clicked) {
-    audio.Map.play();
+    audio.map.play();
     clicked = true;
   }
 });

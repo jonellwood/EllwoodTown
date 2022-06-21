@@ -95,6 +95,8 @@ class Monster extends Sprite {
     gsap.to(this, {
       opacity: 0,
     });
+    audio.battle.stop();
+    audio.faint.play();
   }
 
   respect({ respect, recipient, renderedSprites }) {
@@ -113,6 +115,7 @@ class Monster extends Sprite {
     switch (respect.name) {
       // name for case is the respect.name that is rendered on the button = not the obj name
       case "WarmFuzzy":
+        audio.initWarm.play();
         const warmImage = new Image();
         warmImage.src = "./images/fireball.png";
         const warm = new Sprite({
@@ -135,6 +138,8 @@ class Monster extends Sprite {
           y: recipient.position.y,
           duration: 1.5,
           onComplete: () => {
+            // enemy is struck
+            audio.warmHit.play();
             gsap.to(recipient.healthBar, {
               width: recipient.health + "%",
             });
@@ -212,6 +217,7 @@ class Monster extends Sprite {
             duration: 0.1,
             onComplete: () => {
               // enemy gets hit with respect
+              audio.compHit.play();
               gsap.to(healthBar, {
                 width: recipient.health + "%",
               });
