@@ -1,31 +1,38 @@
 class Sprite {
   constructor({
     position,
-
     image,
     frames = { max: 1, hold: 10 },
     sprites,
     animate = false,
-    isEnemy = false,
-    name,
+    rotation = 0,
   }) {
     this.position = position;
-    this.image = image;
+    this.image = new Image();
     this.frames = { ...frames, val: 0, elapsed: 0 };
     this.image.onload = () => {
       this.width = this.image.width / this.frames.max;
       this.height = this.image.height;
     };
+    this.image.src = image.src;
     this.animate = animate;
     this.sprites = sprites;
     this.opacity = 1;
-    this.health = 0;
-    this.isEnemy = isEnemy;
-    this.name = name;
+
+    this.rotation = rotation;
   }
 
   draw() {
     c.save(); // save and restore allows access to global canvas property but contains it to what it is called on
+    c.translate(
+      this.position.x + this.width / 2,
+      this.position.y + this.height / 2
+    );
+    c.rotate(this.rotation); // default is zero
+    c.translate(
+      -this.position.x - this.width / 2,
+      -this.position.y - this.height / 2
+    );
     c.globalAlpha = this.opacity;
     c.drawImage(
       this.image,
@@ -50,33 +57,86 @@ class Sprite {
       else this.frames.val = 0;
     }
   }
+}
+
+class Monster extends Sprite {
+  constructor({
+    isEnemy = false,
+    name,
+    position,
+    image,
+    frames = { max: 1, hold: 10 },
+    sprites,
+    animate = false,
+    rotation = 0,
+    respects,
+  }) {
+    super({
+      //assigned from the parent so only pass in the properties - no values
+      position,
+      image,
+      frames,
+      sprites,
+      animate,
+      rotation,
+    });
+    this.health = 0;
+    this.isEnemy = isEnemy;
+    this.name = name;
+    this.respects = respects;
+  }
+
+  faint() {
+    document.querySelector("#wordBox").innerHTML =
+      this.name + " is full of love";
+    gsap.to(this.position, {
+      y: this.position.y + 20,
+    });
+    gsap.to(this, {
+      opacity: 0,
+    });
+  }
+
   respect({ respect, recipient, renderedSprites }) {
+    document.querySelector("#wordBox").style.display = "block";
+    document.querySelector("#wordBox").innerHTML =
+      this.name + " used " + respect.name;
+
     let healthBar = "#enemyHealthBar";
     if (this.isEnemy) healthBar = "#playerHealthBar";
 
-    this.health += respect.healing;
+    let rotation = 1;
+    if (this.isEnemy) rotation = -2;
+
+    recipient.health += respect.healing;
 
     switch (respect.name) {
-      case "Admire":
-        const heartImage = new Image();
-        heartImage.src = "./images/heart.png";
-        const heart = new Sprite({
+      // name for case is the respect.name that is rendered on the button = not the obj name
+      case "WarmFuzzy":
+        const warmImage = new Image();
+        warmImage.src = "./images/fireball.png";
+        const warm = new Sprite({
           position: {
             x: this.position.x,
             y: this.position.y,
           },
-          image: heartImage,
+          image: warmImage,
+          frames: {
+            max: 4,
+          },
+          rotation,
         });
 
-        renderedSprites.push(heart);
+        // renderedSprites.push(heart);
+        renderedSprites.splice(1, 0, warm);
 
-        gsap.to(heart.position, {
+        gsap.to(warm.position, {
           x: recipient.position.x,
           y: recipient.position.y,
           duration: 1.5,
           onComplete: () => {
             gsap.to(recipient.healthBar, {
-              width: this.health + "%",
+              width: recipient.health + "%",
             });
             gsap.to(recipient.position, {
               y: recipient.position.y + 10,
@@ -91,7 +151,48 @@ class Sprite {
               repeat: 5,
               duration: 0.08,
             });
-            renderedSprites.pop();
+            renderedSprites.splice(1, 1);
+          },
+        });
+
+        break;
+      case "Admire":
+        const heartImage = new Image();
+        heartImage.src = "./images/heart.png";
+        const heart = new Sprite({
+          position: {
+            x: this.position.x,
+            y: this.position.y,
+          },
+          image: heartImage,
+          // rotation,
+        });
+
+        // renderedSprites.push(heart);
+        renderedSprites.splice(1, 0, heart);
+
+        gsap.to(heart.position, {
+          x: recipient.position.x,
+          y: recipient.position.y,
+          duration: 1.5,
+          onComplete: () => {
+            gsap.to(recipient.healthBar, {
+              width: recipient.health + "%",
+            });
+            gsap.to(recipient.position, {
+              y: recipient.position.y + 10,
+              yoyo: true,
+              repeat: 5,
+              duration: 0.08,
+            });
+
+            gsap.to(recipient, {
+              opacity: 0,
+              yoyo: true,
+              repeat: 5,
+              duration: 0.08,
+            });
+            renderedSprites.splice(1, 1);
           },
         });
 
@@ -112,7 +213,7 @@ class Sprite {
             onComplete: () => {
               // enemy gets hit with respect
               gsap.to(healthBar, {
-                width: this.health + "%",
+                width: recipient.health + "%",
               });
               gsap.to(recipient.position, {
                 y: recipient.position.y + 10,
@@ -134,10 +235,6 @@ class Sprite {
           });
         break;
     }
-
-    document.querySelector("#wordBox").style.display = "block";
-    document.querySelector("#wordBox").innerHTML =
-      this.name + " used " + respect.name;
   }
 }
 

@@ -1,18 +1,27 @@
 const respects = {
   Compliment: {
     name: "Compliment",
-    healing: 20,
-    type: "Normal",
+    healing: 60,
+    type: "Nice",
+    color: "blue",
   },
   Admire: {
     name: "Admire",
     healing: 20,
-    type: "Normal",
+    type: "Loving",
+    color: "red",
   },
   Blessings: {
     name: "Blessings",
     healing: 30,
-    type: "Normal",
+    type: "Spiritual",
+    color: "black",
+  },
+  WarmFuzzy: {
+    name: "WarmFuzzy",
+    healing: 20,
+    type: "Just nice",
+    color: "red",
   },
 };
 

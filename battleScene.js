@@ -9,47 +9,108 @@ const battleBackground = new Sprite({
   image: battleBackgroundImage,
 });
 
-const draggleImage = new Image();
-draggleImage.src = "./images/draggleSprite.png";
-const draggle = new Sprite({
-  position: {
-    x: 800,
-    y: 100,
-  },
-  image: draggleImage,
-  frames: {
-    max: 4,
-    hold: 30,
-  },
-  animate: true,
-  isEnemy: true,
-  name: "Draggle",
-});
+let draggle;
+let emby;
+let renderedSprites;
+let queue;
+// populate respect buttons based on character / monster
 
-const embyImage = new Image();
-embyImage.src = "./images/embySprite.png";
-const emby = new Sprite({
-  position: {
-    x: 275,
-    y: 350,
-  },
-  image: embyImage,
-  frames: {
-    max: 4,
-    hold: 30,
-  },
-  animate: true,
-  name: "Emby",
-});
+// console.log(emby.respects);
+// console.log(Object.entries(emby));
 
-const renderedSprites = [];
+let battleAnimationId;
+
+function initBattle() {
+  document.querySelector("#userInterface").style.display = "block";
+  document.querySelector("#wordBox").style.display = "none";
+  document.querySelector("#enemyHealthBar").style.width = "20%";
+  document.querySelector("#playerHealthBar").style.width = "20%";
+  document.querySelector("#respectsBox").replaceChildren();
+
+  draggle = new Monster(monsters.Draggle);
+  emby = new Monster(monsters.Emby);
+  renderedSprites = [draggle, emby];
+  queue = [];
+
+  emby.respects.forEach((respect) => {
+    const button = document.createElement("button");
+    button.innerHTML = respect.name;
+    document.querySelector("#respectsBox").append(button);
+  });
+  // Event listeners for buttons
+  document.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const selectedRespect = respects[e.currentTarget.innerHTML];
+      emby.respect({
+        respect: selectedRespect,
+        recipient: draggle,
+        renderedSprites,
+      });
+      if (draggle.health >= 100) {
+        queue.push(() => {
+          draggle.faint();
+        });
+        queue.push(() => {
+          gsap.to("#overlappingDiv", {
+            opacity: 1,
+            onComplete: () => {
+              window.cancelAnimationFrame(battleAnimationId);
+              animate();
+              document.querySelector("#userInterface").style.display = "none";
+              gsap.to("#overlappingDiv", {
+                opacity: 0,
+              });
+              battle.initiated = false;
+            },
+          });
+        });
+      }
+      // draggle or enemy "attacks" right here - but with love
+      const randomRespect =
+        draggle.respects[Math.floor(Math.random() * draggle.respects.length)];
+
+      queue.push(() => {
+        draggle.respect({
+          respect: randomRespect,
+          recipient: emby,
+          renderedSprites,
+        });
+
+        if (emby.health >= 100) {
+          queue.push(() => {
+            emby.faint();
+          });
+          queue.push(() => {
+            gsap.to("#overlappingDiv", {
+              opacity: 1,
+              onComplete: () => {
+                window.cancelAnimationFrame(battleAnimationId);
+                animate();
+                document.querySelector("#userInterface").style.display = "none";
+                gsap.to("#overlappingDiv", {
+                  opacity: 0,
+                });
+                battle.initiated = false;
+              },
+            });
+          });
+        }
+      });
+    });
+    button.addEventListener("mouseenter", (e) => {
+      const selectedRespect = respects[e.currentTarget.innerHTML];
+      document.querySelector("#respectTypeBox").innerHTML =
+        selectedRespect.type;
+      document.querySelector("#respectTypeBox").style.color =
+        selectedRespect.color;
+    });
+  });
+}
 
 function animateBattle() {
-  window.requestAnimationFrame(animateBattle);
-  // console.log("battle animation starting. Hold ON!! ");
+  battleAnimationId = window.requestAnimationFrame(animateBattle);
   battleBackground.draw();
-  draggle.draw();
-  emby.draw();
+  //   console.log(battleAnimationId);
 
   renderedSprites.forEach((sprite) => {
     sprite.draw();
@@ -57,34 +118,8 @@ function animateBattle() {
 }
 
 // animate();
+initBattle();
 animateBattle();
-
-const queue = [];
-// Event listeners for buttons
-document.querySelectorAll("button").forEach((button) => {
-  button.addEventListener("click", (e) => {
-    const selectedRespect = respects[e.currentTarget.innerHTML];
-    emby.respect({
-      respect: selectedRespect,
-      recipient: draggle,
-      renderedSprites,
-    });
-    queue.push(() => {
-      draggle.respect({
-        respect: respects.Admire,
-        recipient: emby,
-        renderedSprites,
-      });
-    });
-    queue.push(() => {
-      draggle.respect({
-        respect: respects.Compliment,
-        recipient: emby,
-        renderedSprites,
-      });
-    });
-  });
-});
 
 document.querySelector("#wordBox").addEventListener("click", (e) => {
   if (queue.length > 0) {
