@@ -117,9 +117,9 @@ function animateBattle() {
   });
 }
 
-// animate();
-initBattle();
-animateBattle();
+animate();
+// initBattle();
+// animateBattle();
 
 document.querySelector("#wordBox").addEventListener("click", (e) => {
   if (queue.length > 0) {
