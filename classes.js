@@ -6,6 +6,7 @@ class Sprite {
     sprites,
     animate = false,
     rotation = 0,
+    scale = 1,
   }) {
     this.position = position;
     this.image = new Image();
@@ -18,8 +19,8 @@ class Sprite {
     this.animate = animate;
     this.sprites = sprites;
     this.opacity = 1;
-
     this.rotation = rotation;
+    this.scale = scale;
   }
 
   draw() {
@@ -34,16 +35,35 @@ class Sprite {
       -this.position.y - this.height / 2
     );
     c.globalAlpha = this.opacity;
+
+    const crop = {
+      position: {
+        x: this.frames.val * this.width,
+        y: 0,
+      },
+      width: this.image.width / this.frames.max,
+      height: this.image.height,
+    };
+
+    const image = {
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      width: this.image.width / this.frames.max,
+      height: this.image.height,
+    };
+
     c.drawImage(
       this.image,
-      this.frames.val * this.width,
-      0,
-      this.image.width / this.frames.max,
-      this.image.height,
-      this.position.x,
-      this.position.y,
-      this.image.width / this.frames.max,
-      this.image.height
+      crop.position.x,
+      crop.position.y,
+      crop.width,
+      crop.height,
+      image.position.x,
+      image.position.y,
+      image.width * this.scale,
+      image.height * this.scale
     );
     c.restore();
     if (!this.animate) return;

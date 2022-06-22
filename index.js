@@ -21,6 +21,13 @@ for (let i = 0; i < battleZonesData.length; i += 70) {
 }
 // console.log(battleZonesMap);
 
+const charactersMap = [];
+for (let i = 0; i < charactersMapData.length; i += 70) {
+  charactersMap.push(charactersMapData.slice(i, 70 + i));
+}
+
+// console.log(charactersMap);
+
 const boundaries = [];
 // create const for offset to it can be called for player position and boundary position with the same constant offset
 const offset = {
@@ -61,6 +68,42 @@ battleZonesMap.forEach((row, i) => {
 });
 
 // console.log(battleZones);
+
+const goobieImage = new Image();
+goobieImage.src = "./images/goobie.png";
+
+const characters = [];
+
+charactersMap.forEach((row, i) => {
+  row.forEach((symbol, j) => {
+    if (symbol === 1026) {
+      boundaries.push(
+        new Boundary({
+          position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y,
+          },
+        })
+      );
+      characters.push(
+        new Sprite({
+          position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y,
+          },
+          image: goobieImage,
+          frames: {
+            max: 4,
+            hold: 60,
+          },
+          scale: 3,
+          // animate: true,
+        })
+      );
+    }
+  });
+});
+// console.log(characters);
 
 const image = new Image();
 image.src = "./images/EllwoodCity.png";
@@ -130,7 +173,21 @@ const keys = {
   },
 };
 
-const movables = [background, ...boundaries, foreground, ...battleZones];
+const movables = [
+  background,
+  ...boundaries,
+  foreground,
+  ...battleZones,
+  ...characters,
+];
+const renderables = [
+  background,
+  ...boundaries,
+  ...battleZones,
+  ...characters,
+  player,
+  foreground,
+];
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
@@ -147,15 +204,11 @@ const battle = {
 
 function animate() {
   const animationId = window.requestAnimationFrame(animate);
-  background.draw();
-  boundaries.forEach((boundary) => {
-    boundary.draw();
+
+  renderables.forEach((renderable) => {
+    renderable.draw();
   });
-  battleZones.forEach((battleZone) => {
-    battleZone.draw();
-  });
-  player.draw();
-  foreground.draw();
+
   let moving = true;
   player.animate = false;
 
